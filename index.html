@@ -93,6 +93,60 @@ small.note{display:block;color:var(--sub);margin-top:8px;line-height:1.5}.stats{
   .circleinfo{grid-template-columns:minmax(0,max-content) minmax(0,1fr)}
 }
 
+
+/* v1.2.1 mobile card polish */
+.cardrow{
+  grid-template-columns:max-content max-content minmax(0,1fr) max-content 28px!important;
+  column-gap:8px!important;
+}
+.hallcell,.spacecell,.circleinfo .circle{
+  font-size:16px!important;
+  font-weight:700!important;
+  color:var(--ink)!important;
+}
+.circleinfo .hn{
+  font-size:11px!important;
+  font-weight:400!important;
+  color:var(--sub)!important;
+}
+.cardrow .done{
+  display:flex!important;
+  width:28px!important;
+  height:28px!important;
+  align-items:center!important;
+  justify-content:center!important;
+  overflow:visible!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+.cardrow .done input[type="checkbox"]{
+  display:block!important;
+  -webkit-appearance:none!important;
+  appearance:none!important;
+  width:22px!important;
+  height:22px!important;
+  min-width:22px!important;
+  min-height:22px!important;
+  border:2px solid #8f8b8d!important;
+  border-radius:7px!important;
+  background:#fff!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+.cardrow .done input[type="checkbox"]:checked{
+  background:#d98598!important;
+  border-color:#d98598!important;
+}
+.cardrow .done input[type="checkbox"]:checked::after{
+  content:"✓"!important;
+  display:block!important;
+  color:#fff!important;
+  font-size:15px!important;
+  font-weight:800!important;
+  line-height:18px!important;
+  text-align:center!important;
+}
+
 </style>
 </head>
 <body><div class="app">
