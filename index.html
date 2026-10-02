@@ -43,6 +43,56 @@ small.note{display:block;color:var(--sub);margin-top:8px;line-height:1.5}.stats{
 .done input[type="checkbox"]:checked{background:#d98598!important;border-color:#d98598!important}
 .done input[type="checkbox"]:checked:after{content:"✓";display:block;color:#fff;font-size:14px;font-weight:800;line-height:16px;text-align:center}
 
+
+/* v1.2 card layout: fixed important info + flexible 1–2 line circle area */
+.cardrow{
+  display:grid!important;
+  grid-template-columns:max-content max-content minmax(0,1fr) max-content 24px!important;
+  column-gap:9px!important;
+  align-items:center!important;
+  padding:10px 12px 10px 16px!important;
+  min-height:58px!important;
+}
+.hallcell{font-size:15px;color:var(--sub);white-space:nowrap}
+.spacecell{font-size:17px;font-weight:800;color:var(--ink);white-space:nowrap}
+.circleinfo{
+  min-width:0;
+  display:grid;
+  grid-template-columns:minmax(0,max-content) minmax(0,1fr);
+  align-items:baseline;
+  column-gap:7px;
+}
+.circleinfo .circle{
+  font-size:15px;
+  font-weight:700;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.circleinfo .hn{
+  font-size:11px;
+  color:var(--sub);
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.cardrow .money{font-size:15px;font-weight:800;color:#cf7189;white-space:nowrap;margin:0!important;line-height:1!important}
+.cardrow .done{width:20px;height:20px;margin:0!important;padding:0!important;line-height:20px!important}
+.cardrow .done input[type="checkbox"]{-webkit-appearance:none!important;appearance:none!important;width:20px!important;height:20px!important;margin:0!important;border:2px solid #8f8b8d!important;border-radius:6px!important;background:#fff!important;display:block!important}
+.cardrow .done input[type="checkbox"]:checked{background:#d98598!important;border-color:#d98598!important}
+.cardrow .done input[type="checkbox"]:checked:after{content:"✓";display:block;color:white;font-size:14px;font-weight:800;line-height:16px;text-align:center}
+
+/* If the center area gets tight, HN drops below the circle name while the fixed cells stay put. */
+@media (max-width:430px){
+  .circleinfo{grid-template-columns:minmax(0,1fr)}
+  .circleinfo .hn{grid-row:2;margin-top:2px}
+}
+@media (min-width:431px){
+  .circleinfo{grid-template-columns:minmax(0,max-content) minmax(0,1fr)}
+}
+
 </style>
 </head>
 <body><div class="app">
@@ -74,7 +124,7 @@ function render(){
  $('mapArea').innerHTML=data.map?`<img src="${data.map}" id="mapImg">`:'<p style="color:var(--sub)">会場マップ画像を登録してください</p>';
  if(data.map)$('mapImg').onclick=()=>showImage(data.map);
 }
-function cardHTML(c){let open=openId===c.id;return `<div class="card" style="--prio:${colors[c.priority]||colors.normal}"><div class="row" onclick="toggle('${c.id}')"><div class="place">${esc(c.hall)}<b>${esc(c.space)}</b></div><div class="circleline"><div class="circle">${esc(c.name||'名称未入力')}</div><div class="hn">${esc(c.hn||'')}</div></div><div><div class="money">${yen(planned(c))}</div><div class="done" onclick="event.stopPropagation()"><input title="訪問済" aria-label="訪問済" type="checkbox" ${c.done?'checked':''} onchange="setDone('${c.id}',this.checked)"></div></div></div>${open?detailsHTML(c):''}</div>`}
+function cardHTML(c){let open=openId===c.id;return `<div class="card" style="--prio:${colors[c.priority]||colors.normal}"><div class="row cardrow" onclick="toggle('${c.id}')"><div class="hallcell">${esc(c.hall)}</div><div class="spacecell">${esc(c.space)}</div><div class="circleinfo"><div class="circle">${esc(c.name||'名称未入力')}</div><div class="hn">${esc(c.hn||'')}</div></div><div class="money">${yen(planned(c))}</div><div class="done" onclick="event.stopPropagation()"><input title="訪問済" aria-label="訪問済" type="checkbox" ${c.done?'checked':''} onchange="setDone('${c.id}',this.checked)"></div></div>${open?detailsHTML(c):''}</div>`}
 function detailsHTML(c){return `<div class="details"><table class="items"><thead><tr><th>購入</th><th>頒布物</th><th>単価</th><th>上限</th><th>予定数</th><th>小計</th></tr></thead><tbody>${c.items.map((i,x)=>`<tr><td><input type="checkbox" ${i.bought?'checked':''} onchange="itemBought('${c.id}',${x},this.checked)"></td><td>${esc(i.name)}</td><td>${yen(i.price)}</td><td>${esc(i.limit||'-')}</td><td><input class="qty" type="number" min="0" value="${+i.qty||0}" onchange="setQty('${c.id}',${x},this.value)"></td><td>${yen((+i.price||0)*(+i.qty||0))}</td></tr>`).join('')}</tbody></table>${c.memo?`<div class="memo">${esc(c.memo)}</div>`:''}${c.images?.length?`<div class="thumbs">${c.images.map((im,j)=>`<img src="${im}" onclick="event.stopPropagation();showImage(data.circles.find(c=>c.id==='${c.id}').images[${j}])">`).join('')}</div>`:''}<div class="actions"><button class="btn sub" onclick="editCircle('${c.id}')">編集</button></div></div>`}
 window.toggle=id=>{openId=openId===id?null:id;render()}; window.setDone=(id,v)=>{data.circles.find(c=>c.id===id).done=v;save()};window.itemBought=(id,x,v)=>{data.circles.find(c=>c.id===id).items[x].bought=v;save()};window.setQty=(id,x,v)=>{data.circles.find(c=>c.id===id).items[x].qty=Math.max(0,+v||0);save()};
 function page(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('activepage'));$(id).classList.add('activepage');document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));$('fab').style.display=id==='listPage'?'block':'none';if(id==='addPage'&&!$('editId').value)resetEditor()}
