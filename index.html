@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f7d9df">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="お買い物リスト">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon.svg">
+<title>同人誌即売会 お買い物リスト</title>
+<style>
+:root{--pink:#f6d9df;--pink2:#fff3f5;--mint:#dcefe8;--lav:#e9e3f5;--cream:#fffaf2;--ink:#4c4548;--sub:#8b8185;--line:#eadfe2;--accent:#d98598;--shadow:0 5px 18px #765a6414}
+*{box-sizing:border-box} body{margin:0;background:#fff9fa;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}.app{max-width:680px;margin:auto;min-height:100vh;padding-bottom:88px}
+header{position:sticky;top:0;z-index:10;background:#fff9faf2;backdrop-filter:blur(12px);padding:14px 16px 10px;border-bottom:1px solid var(--line)}
+h1{font-size:20px;margin:0 0 4px}.eventmeta{font-size:12px;color:var(--sub)}.summary{display:flex;gap:8px;margin-top:10px}
+.pill{flex:1;padding:10px 12px;border-radius:15px;background:var(--pink);font-size:12px}.pill b{display:block;font-size:18px;margin-top:2px}
+main{padding:14px 14px 0}.toolbar{display:flex;gap:8px;margin-bottom:10px}.toolbar select{flex:1;border:1px solid var(--line);background:white;padding:9px;border-radius:12px}
+.card{position:relative;background:white;border-radius:16px;margin:9px 0;box-shadow:var(--shadow);border:1px solid #f1e7ea;overflow:hidden}
+.card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--prio,#d7cdd0)}
+.row{display:grid;grid-template-columns:72px 1fr auto;gap:10px;align-items:center;padding:12px 12px 12px 16px}.place{font-size:12px;color:var(--sub)}.place b{display:block;color:var(--ink);font-size:14px}
+.circle{font-weight:700;font-size:15px}.hn{font-size:11px;color:var(--sub);margin-top:3px}.money{font-weight:800;color:#cf7189;text-align:right}.done{margin-top:5px}
+.details{border-top:1px solid var(--line);padding:10px 12px 13px;background:#fffdfd}.items{width:100%;border-collapse:collapse;font-size:11px}.items th{color:var(--sub);font-weight:600;padding:5px 2px}.items td{border-top:1px solid #f2e9eb;padding:7px 2px;text-align:center}.items td:nth-child(2){text-align:left;font-size:12px}
+.qty{width:42px;padding:5px;border:1px solid var(--line);border-radius:8px;text-align:center}.memo{background:var(--cream);padding:9px;border-radius:10px;font-size:12px;margin-top:10px;white-space:pre-wrap}
+.thumbs{display:flex;gap:7px;overflow:auto;margin-top:9px}.thumbs img{width:78px;height:78px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+.actions{display:flex;justify-content:flex-end;gap:7px;margin-top:9px}.btn{border:0;border-radius:11px;padding:8px 12px;background:var(--pink);font-weight:700}.btn.sub{background:#f2edef}
+.empty{text-align:center;padding:60px 20px;color:var(--sub)}nav{position:fixed;z-index:20;bottom:0;left:50%;transform:translateX(-50%);width:min(680px,100%);height:72px;background:#fffdfdf2;backdrop-filter:blur(14px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom)}
+nav button{border:0;background:none;font-size:10px}nav button span{display:block;font-size:21px;margin-bottom:2px}.active{color:#c7667e;font-weight:800}
+.page{display:none}.page.activepage{display:block}.mapbox{background:white;border:1px dashed #d9cbd0;border-radius:18px;padding:12px;text-align:center}.mapbox img{max-width:100%;border-radius:12px}
+.form{background:white;border-radius:18px;padding:14px;box-shadow:var(--shadow)}label{font-size:12px;color:var(--sub);display:block;margin:9px 0 4px}input,textarea,select{width:100%;border:1px solid var(--line);border-radius:10px;padding:9px;background:white}textarea{min-height:70px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.itemedit{display:grid;grid-template-columns:1.5fr .8fr .6fr .6fr auto;gap:4px;margin:6px 0}.itemedit input{padding:7px}.danger{background:#eee6e8}
+.fab{position:fixed;right:max(18px,calc((100vw - 680px)/2 + 18px));bottom:88px;border:0;background:#d98598;color:white;width:52px;height:52px;border-radius:50%;font-size:28px;box-shadow:0 6px 18px #9d667477}
+.lightbox{display:none;position:fixed;z-index:99;inset:0;background:#000d;align-items:center;justify-content:center;padding:16px}.lightbox img{max-width:100%;max-height:92vh}.lightbox.show{display:flex}
+small.note{display:block;color:var(--sub);margin-top:8px;line-height:1.5}.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{background:white;border-radius:16px;padding:16px;box-shadow:var(--shadow)}.stat b{font-size:22px;display:block;margin-top:5px}
+</style>
+</head>
+<body><div class="app">
+<header><h1 id="eventTitle">イベント名</h1><div class="eventmeta" id="eventMeta">日付・場所</div><div class="summary"><div class="pill">購入予定<b id="planTotal">¥0</b></div><div class="pill" style="background:var(--mint)">購入済<b id="boughtTotal">¥0</b></div></div></header>
+<main>
+<section id="listPage" class="page activepage"><div class="toolbar"><select id="sort"><option value="priority">優先度順</option><option value="space">スペース順</option><option value="name">サークル名順</option></select><select id="filter"><option value="all">すべて</option><option value="todo">未訪問</option><option value="done">訪問済</option><option value="must">絶対・優先のみ</option></select></div><div id="list"></div></section>
+<section id="mapPage" class="page"><div class="mapbox"><h3>🗺 会場マップ</h3><div id="mapArea"></div><input id="mapInput" type="file" accept="image/*"><small class="note">画像はこの端末内に保存します。タップで拡大できます。</small></div></section>
+<section id="addPage" class="page"><div class="form"><h3 id="editTitle">サークル追加</h3><input id="editId" type="hidden"><div class="grid2"><div><label>優先度</label><select id="priority"><option value="must">🔥 絶対</option><option value="high">★ 優先</option><option value="normal" selected>○ 通常</option><option value="low">△ 余裕があれば</option></select></div><div><label>ホール</label><input id="hall" placeholder="西2"></div></div><div class="grid2"><div><label>スペース</label><input id="space" placeholder="ぬ21b"></div><div><label>HN</label><input id="hn" placeholder="主HN"></div></div><label>サークル名</label><input id="circleName"><label>備考メモ</label><textarea id="memo"></textarea><label>お品書き・注意事項画像</label><input id="images" type="file" accept="image/*" multiple><div id="imageCount"></div><label>頒布物</label><div id="itemEditor"></div><button class="btn sub" id="addItem" type="button">＋ 頒布物を追加</button><div class="actions"><button class="btn danger" id="deleteCircle" type="button" style="display:none">削除</button><button class="btn" id="saveCircle" type="button">保存</button></div></div></section>
+<section id="statsPage" class="page"><div class="stats"><div class="stat">サークル数<b id="statCircles">0</b></div><div class="stat">訪問済<b id="statDone">0</b></div><div class="stat">購入予定<b id="statPlan">¥0</b></div><div class="stat">購入済<b id="statBought">¥0</b></div></div></section>
+<section id="settingsPage" class="page"><div class="form"><h3>⚙ イベント設定</h3><label>イベント名</label><input id="setTitle"><label>日付</label><input id="setDate" type="date"><label>場所</label><input id="setPlace"><div class="actions"><button class="btn" id="saveSettings">保存</button></div><hr style="border:0;border-top:1px solid var(--line);margin:18px 0"><h3>バックアップ</h3><button class="btn" id="exportBtn">JSONを書き出す</button><label>JSONから復元</label><input id="importInput" type="file" accept=".json,application/json"><small class="note">端末やブラウザのデータ削除に備えて、イベント前にバックアップ推奨です。</small></div></section>
+</main>
+<button class="fab" id="fab">＋</button>
+<nav><button data-page="listPage" class="active"><span>📋</span>リスト</button><button data-page="mapPage"><span>🗺</span>地図</button><button data-page="addPage"><span>＋</span>追加</button><button data-page="statsPage"><span>📊</span>集計</button><button data-page="settingsPage"><span>⚙</span>設定</button></nav>
+</div><div class="lightbox" id="lightbox"><img id="lightImg"></div>
+<script>
+const KEY='doujinShop_pwa_v1', colors={must:'#e68496',high:'#e8b878',normal:'#91cdb9',low:'#bcb2d8'}, rank={must:0,high:1,normal:2,low:3};
+let data=JSON.parse(localStorage.getItem(KEY)||'null')||{event:{title:'イベント名',date:'',place:''},circles:[],map:null}; let openId=null, editImages=[];
+const $=id=>document.getElementById(id), yen=n=>'¥'+Number(n||0).toLocaleString(), save=()=>{localStorage.setItem(KEY,JSON.stringify(data));render()};
+function planned(c){return c.items.reduce((s,i)=>s+(+i.price||0)*(+i.qty||0),0)} function bought(c){return c.items.reduce((s,i)=>s+(i.bought?(+i.price||0)*(+i.qty||0):0),0)}
+function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function render(){
+ $('eventTitle').textContent=data.event.title||'イベント名'; $('eventMeta').textContent=[data.event.date,data.event.place].filter(Boolean).join(' ・ ')||'日付・場所';
+ const p=data.circles.reduce((s,c)=>s+planned(c),0), b=data.circles.reduce((s,c)=>s+bought(c),0); $('planTotal').textContent=yen(p);$('boughtTotal').textContent=yen(b);
+ let cs=[...data.circles], f=$('filter').value, s=$('sort').value;
+ if(f==='todo')cs=cs.filter(c=>!c.done); if(f==='done')cs=cs.filter(c=>c.done); if(f==='must')cs=cs.filter(c=>['must','high'].includes(c.priority));
+ cs.sort(s==='priority'?(a,b)=>rank[a.priority]-rank[b.priority]:s==='space'?(a,b)=>(a.hall+a.space).localeCompare(b.hall+b.space,'ja'):(a,b)=>a.name.localeCompare(b.name,'ja'));
+ $('list').innerHTML=cs.length?cs.map(cardHTML).join(''):'<div class="empty">まだサークルがありません。<br>＋から追加してね。</div>';
+ $('statCircles').textContent=data.circles.length;$('statDone').textContent=data.circles.filter(c=>c.done).length;$('statPlan').textContent=yen(p);$('statBought').textContent=yen(b);
+ $('mapArea').innerHTML=data.map?`<img src="${data.map}" id="mapImg">`:'<p style="color:var(--sub)">会場マップ画像を登録してください</p>';
+ if(data.map)$('mapImg').onclick=()=>showImage(data.map);
+}
+function cardHTML(c){let open=openId===c.id;return `<div class="card" style="--prio:${colors[c.priority]||colors.normal}"><div class="row" onclick="toggle('${c.id}')"><div class="place">${esc(c.hall)}<b>${esc(c.space)}</b></div><div><div class="circle">${esc(c.name||'名称未入力')}</div><div class="hn">${esc(c.hn||'')}</div></div><div><div class="money">${yen(planned(c))}</div><div class="done" onclick="event.stopPropagation()"><input type="checkbox" ${c.done?'checked':''} onchange="setDone('${c.id}',this.checked)"> 済</div></div></div>${open?detailsHTML(c):''}</div>`}
+function detailsHTML(c){return `<div class="details"><table class="items"><thead><tr><th>購入</th><th>頒布物</th><th>単価</th><th>上限</th><th>予定数</th><th>小計</th></tr></thead><tbody>${c.items.map((i,x)=>`<tr><td><input type="checkbox" ${i.bought?'checked':''} onchange="itemBought('${c.id}',${x},this.checked)"></td><td>${esc(i.name)}</td><td>${yen(i.price)}</td><td>${esc(i.limit||'-')}</td><td><input class="qty" type="number" min="0" value="${+i.qty||0}" onchange="setQty('${c.id}',${x},this.value)"></td><td>${yen((+i.price||0)*(+i.qty||0))}</td></tr>`).join('')}</tbody></table>${c.memo?`<div class="memo">${esc(c.memo)}</div>`:''}${c.images?.length?`<div class="thumbs">${c.images.map((im,j)=>`<img src="${im}" onclick="event.stopPropagation();showImage(data.circles.find(c=>c.id==='${c.id}').images[${j}])">`).join('')}</div>`:''}<div class="actions"><button class="btn sub" onclick="editCircle('${c.id}')">編集</button></div></div>`}
+window.toggle=id=>{openId=openId===id?null:id;render()}; window.setDone=(id,v)=>{data.circles.find(c=>c.id===id).done=v;save()};window.itemBought=(id,x,v)=>{data.circles.find(c=>c.id===id).items[x].bought=v;save()};window.setQty=(id,x,v)=>{data.circles.find(c=>c.id===id).items[x].qty=Math.max(0,+v||0);save()};
+function page(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('activepage'));$(id).classList.add('activepage');document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));$('fab').style.display=id==='listPage'?'block':'none';if(id==='addPage'&&!$('editId').value)resetEditor()}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>page(b.dataset.page));$('fab').onclick=()=>{resetEditor();page('addPage')};$('sort').onchange=render;$('filter').onchange=render;
+function resetEditor(){ $('editTitle').textContent='サークル追加';$('editId').value='';$('priority').value='normal';['hall','space','hn','circleName','memo'].forEach(id=>$(id).value='');editImages=[];$('imageCount').textContent='';$('itemEditor').innerHTML='';addItemRow();$('deleteCircle').style.display='none'}
+function addItemRow(i={name:'',price:'',limit:'',qty:1,bought:false}){let d=document.createElement('div');d.className='itemedit';d.dataset.bought=i.bought?'1':'0';d.innerHTML=`<input placeholder="頒布物" value="${esc(i.name)}"><input type="number" placeholder="価格" value="${i.price}"><input placeholder="上限" value="${esc(i.limit)}"><input type="number" min="0" placeholder="数" value="${i.qty}"><button class="btn sub" type="button">×</button>`;d.lastElementChild.onclick=()=>d.remove();$('itemEditor').appendChild(d)}
+$('addItem').onclick=()=>addItemRow();
+window.editCircle=id=>{let c=data.circles.find(c=>c.id===id);$('editId').value=id;$('editTitle').textContent='サークル編集';$('priority').value=c.priority;$('hall').value=c.hall;$('space').value=c.space;$('hn').value=c.hn;$('circleName').value=c.name;$('memo').value=c.memo||'';editImages=[...(c.images||[])];$('imageCount').textContent=`登録画像 ${editImages.length}枚`;$('itemEditor').innerHTML='';c.items.forEach(addItemRow);$('deleteCircle').style.display='inline-block';page('addPage')};
+function compress(file,max=1400,q=.78){return new Promise(res=>{let r=new FileReader();r.onload=e=>{let im=new Image();im.onload=()=>{let sc=Math.min(1,max/Math.max(im.width,im.height)),cv=document.createElement('canvas');cv.width=im.width*sc;cv.height=im.height*sc;cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);res(cv.toDataURL('image/jpeg',q))};im.src=e.target.result};r.readAsDataURL(file)})}
+$('images').onchange=async e=>{for(const f of e.target.files)editImages.push(await compress(f));$('imageCount').textContent=`登録画像 ${editImages.length}枚`;e.target.value=''};
+$('saveCircle').onclick=()=>{let id=$('editId').value, old=data.circles.find(c=>c.id===id);let rows=[...$('itemEditor').children],items=rows.map((r,idx)=>({name:r.children[0].value,price:+r.children[1].value||0,limit:r.children[2].value,qty:+r.children[3].value||0,bought:old?.items?.[idx]?.bought||false}));let c={id:id||Date.now().toString(36),priority:$('priority').value,hall:$('hall').value,space:$('space').value,hn:$('hn').value,name:$('circleName').value,memo:$('memo').value,images:editImages,items,done:old?.done||false};if(old)Object.assign(old,c);else data.circles.push(c);$('editId').value='';save();page('listPage')};
+$('deleteCircle').onclick=()=>{let id=$('editId').value;if(id&&confirm('このサークルを削除しますか？')){data.circles=data.circles.filter(c=>c.id!==id);$('editId').value='';save();page('listPage')}};
+$('mapInput').onchange=async e=>{if(e.target.files[0]){data.map=await compress(e.target.files[0],2200,.82);save();e.target.value=''}};
+window.showImage=src=>{$('lightImg').src=src;$('lightbox').classList.add('show')};$('lightbox').onclick=()=> $('lightbox').classList.remove('show');$('lightImg').onclick=e=>e.stopPropagation();
+$('saveSettings').onclick=()=>{data.event={title:$('setTitle').value,date:$('setDate').value,place:$('setPlace').value};save();alert('保存しました')};
+$('settingsPage').addEventListener('click',()=>{if(!$('setTitle').value){$('setTitle').value=data.event.title;$('setDate').value=data.event.date;$('setPlace').value=data.event.place}});
+$('exportBtn').onclick=()=>{let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download='event-shopping-backup.json';a.click();URL.revokeObjectURL(a.href)};
+$('importInput').onchange=e=>{let r=new FileReader();r.onload=x=>{try{data=JSON.parse(x.target.result);save();alert('復元しました')}catch{alert('JSONを読み込めませんでした')}};if(e.target.files[0])r.readAsText(e.target.files[0])};
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));
+render();
+</script></body></html>
